@@ -35,7 +35,7 @@ public class Example1 {
         // Initialize marker API and get its instance. If marker API is not available or disabled, it will return
         // a dummy implementation which will be inlined by Java VM and no performance impact will be introduced.
         ILikwidMarker marker = LikwidMarkerAPIProvider.getInstance();
-
+        marker.print();
         // Need to init marker API ahead of registering any marker
         marker.init();
         try {
@@ -83,5 +83,7 @@ public class Example1 {
     public static void main(String[] args) {
         Example1 example = new Example1();
         example.run();
+//        ILikwidMarker marker = LikwidMarkerAPIProvider.getInstance();
+//        marker.print();
     }
 }

@@ -1,6 +1,8 @@
 package org.jl.perftools.likwid;
 
 public interface ILikwidMarker {
+
+    void print();
     /**
      * Initialize the Marker API and read the configured eventsets from the environment
      */

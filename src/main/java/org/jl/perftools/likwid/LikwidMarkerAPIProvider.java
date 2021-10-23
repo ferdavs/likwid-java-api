@@ -1,6 +1,12 @@
 package org.jl.perftools.likwid;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 
 public class LikwidMarkerAPIProvider {
     private final static ILikwidMarker likwidMarker;
@@ -26,33 +32,28 @@ public class LikwidMarkerAPIProvider {
     }
 
     private static String extractLib() {
+        try {
+            var current = Paths.get("").toAbsolutePath();
+            var libFile = Files
+                    .find(current, 1000, (path, basicFileAttributes) -> path.getFileName().endsWith("liblikwid_api.so"))
+                    .findFirst();
+            if (libFile.isPresent()) {
+                return libFile.get().toFile().getAbsolutePath();
+            }
+        } catch (IOException ignored) {
+
+        }
         File tmpDir = new File(System.getProperty("java.io.tmpdir"), "likwid-api");
         tmpDir.mkdirs();
         File libFile = new File(tmpDir, "liblikwid-api.so");
         libFile.deleteOnExit();
         InputStream in = LikwidMarkerAPI.class.getResourceAsStream("/liblikwid-api.so");
-        OutputStream out = null;
         try {
-            out = new FileOutputStream(libFile);
-            copyStream(in, out);
+            Files.copy(in, libFile.toPath());
         } catch (Exception e) {
             System.err.printf("Cannot extract library to: %s (%s)%n", libFile.getAbsolutePath(), e.getMessage());
-        } finally {
-            if (out != null) try {
-                out.close();
-            } catch (IOException ignored) {
-            }
         }
 
         return libFile.getAbsolutePath();
-    }
-
-    private static void copyStream(InputStream in, OutputStream out) throws IOException {
-        byte[] buf = new byte[4096];
-        int size = 0;
-        while (size >= 0) {
-            size = in.read(buf);
-            if (size > 0) out.write(buf, 0, size);
-        }
     }
 }

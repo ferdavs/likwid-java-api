@@ -1,11 +1,12 @@
+import org.gradle.internal.jvm.Jvm
+
 plugins {
     id 'java'
     id 'c'
 }
 
 group 'org.jl.perftools'
-version '1.1-SNAPSHOT'
-
+version '1.1'
 sourceCompatibility = 11
 
 repositories {
@@ -15,21 +16,43 @@ repositories {
 dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
 }
+configurations {
+    // configuration that holds jars to include in the jar
+    // extraLibs
+}
+jar {
+    manifest {
+        attributes(
+                //   'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'org.jl.perftools.likwid.examples.Example1'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
 
 model {
+    platforms {
+        x64 {
+            architecture "x64"
+        }
+    }
     components {
-        likwid(NativeLibrarySpec) {
-            def jvmHome = "${org.gradle.internal.jvm.Jvm.current().javaHome}"
+        likwid_api(NativeLibrarySpec) {
+            def jvmHome = "${Jvm.current().javaHome}"
             binaries.all {
                 if (targetPlatform.operatingSystem.macOsX) {
                     cCompiler.args '-I', "$jvmHome/include"
                     cCompiler.args '-I', "$jvmHome/include/darwin"
                     cCompiler.args '-mmacosx-version-min=10.4'
-                    linker.args '-mmacosx-version-min=10.4'
                 } else if (targetPlatform.operatingSystem.linux) {
+                    cCompiler.args '-Wall'
+                    cCompiler.args '-DLIKWID_PERFMON'
                     cCompiler.args '-I', "$jvmHome/include"
                     cCompiler.args '-I', "$jvmHome/include/linux"
                     cCompiler.args '-D_FILE_OFFSET_BITS=64'
+                    linker.args '-llikwid'
                 } else if (targetPlatform.operatingSystem.windows) {
                     cCompiler.args "-I$jvmHome/include"
                     cCompiler.args "-I$jvmHome/include/win32"
@@ -42,3 +65,4 @@ model {
         }
     }
 }
+test.dependsOn 'likwid_apiSharedLibrary'

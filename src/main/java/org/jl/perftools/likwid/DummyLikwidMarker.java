@@ -7,6 +7,11 @@ class DummyLikwidMarker implements ILikwidMarker {
         // empty on purpose
     }
 
+    @Override
+    public void print() {
+        System.out.println("Hello from dummy");
+    }
+
     public void init() {
         // empty on purpose
     }

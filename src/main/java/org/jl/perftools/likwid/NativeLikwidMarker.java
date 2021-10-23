@@ -7,6 +7,11 @@ class NativeLikwidMarker implements ILikwidMarker {
         this.api = api;
     }
 
+    @Override
+    public void print() {
+        api.print();
+    }
+
     public void init() {
         api.init();
     }

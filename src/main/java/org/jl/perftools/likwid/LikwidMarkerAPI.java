@@ -1,6 +1,8 @@
 package org.jl.perftools.likwid;
 
 public class LikwidMarkerAPI {
+    public native void print();
+
     public native void init();
 
     public native void threadInit();

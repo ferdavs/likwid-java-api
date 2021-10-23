@@ -3,8 +3,13 @@
 #include <string.h>
 #include <jni.h>
 #include <likwid.h>
-#include "LikwidMarkerAPI.h"
+//#include "LikwidMarkerAPI.h"
 
+JNIEXPORT void JNICALL Java_org_jl_perftools_likwid_LikwidMarkerAPI_print
+  (JNIEnv *env, jobject obj) {
+    printf("Hello from JNI\n");
+    return;
+}
 /*
  * Class:     org_jl_perftools_likwid_LikwidMarkerAPI
  * Method:    init
@@ -12,6 +17,7 @@
  */
 JNIEXPORT void JNICALL Java_org_jl_perftools_likwid_LikwidMarkerAPI_init
   (JNIEnv *env, jobject obj) {
+	printf("likwid_markerInit\n");
   	likwid_markerInit();
   }
 
@@ -117,4 +123,3 @@ JNIEXPORT void JNICALL Java_org_jl_perftools_likwid_LikwidMarkerAPI_close
   (JNIEnv *env, jobject obj) {
   	likwid_markerClose();
   }
-
