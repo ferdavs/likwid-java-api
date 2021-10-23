@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'c'
+}
+
+group 'org.jl.perftools'
+version '1.1-SNAPSHOT'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
+}
+
+model {
+    components {
+        likwid(NativeLibrarySpec) {
+            def jvmHome = "${org.gradle.internal.jvm.Jvm.current().javaHome}"
+            binaries.all {
+                if (targetPlatform.operatingSystem.macOsX) {
+                    cCompiler.args '-I', "$jvmHome/include"
+                    cCompiler.args '-I', "$jvmHome/include/darwin"
+                    cCompiler.args '-mmacosx-version-min=10.4'
+                    linker.args '-mmacosx-version-min=10.4'
+                } else if (targetPlatform.operatingSystem.linux) {
+                    cCompiler.args '-I', "$jvmHome/include"
+                    cCompiler.args '-I', "$jvmHome/include/linux"
+                    cCompiler.args '-D_FILE_OFFSET_BITS=64'
+                } else if (targetPlatform.operatingSystem.windows) {
+                    cCompiler.args "-I$jvmHome/include"
+                    cCompiler.args "-I$jvmHome/include/win32"
+                    linker.args "Shlwapi.lib", "Advapi32.lib"
+                } else if (targetPlatform.operatingSystem.freeBSD) {
+                    cCompiler.args '-I', "$jvmHome/include"
+                    cCompiler.args '-I', "$jvmHome/include/freebsd"
+                }
+            }
+        }
+    }
+}
